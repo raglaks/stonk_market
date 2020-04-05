@@ -3,10 +3,12 @@ const Discord = require('discord.js');
 
 const client = new Discord.Client();
 
+//  - - - -INITIAL VALUES - - - - -
 let max_value = 0;
 let max_member = "no one";
 let max_message = "no one";
 
+//  - - - -COMMANDS - - - - -
 const price_command = "!price";
 const max_command = "!max";
 
@@ -14,17 +16,21 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+//  - - - - -DO FOR EVERY MESSAGE - - - - -
 client.on('message', msg => {
 
+  //  - - - - STONK - - - - -
   if (msg.content === 'stonk') {
 
     msg.reply(`stonks for life maddafaka`);
 
+
+  //  - - - - PRICE_COMMAND - - - - -
   } else if (msg.content.startsWith(price_command)) {
 
     // get the price
     const intToParse = msg.content.substring(price_command.length, msg.content.len);
-    
+
     // parse it to an int
     const parsedInt = parseInt(intToParse);
 
@@ -34,13 +40,11 @@ client.on('message', msg => {
       msg.reply(`Please input your turnip price as per the following example: "!price 42"`);
 
     } else {
-
       // checks if current price entered is greater than max price
       if (parsedInt > max_value) {
 
         //if so, then set new max price to current price and also set new max member to current member
         max_value = parsedInt;
-
         max_member = msg.author.username;
 
         //string message for who's setting new max price
@@ -50,14 +54,13 @@ client.on('message', msg => {
         msg.reply(`Noting your turnip price to be ${parsedInt}\n${max_message}`);
 
       } else {
-
         //simply for UI purposes--acknowledging user input
+        // Nice to have: change this to an emoji reaction on the message.
         msg.reply(`Noting your turnip price to be ${parsedInt}`);
-
       }
-      
     }
 
+  //  - - - - MAX_COMMAND - - - - -
   } else if (msg.content.startsWith(max_command)) {
 
     //check if max val has been set
@@ -68,18 +71,16 @@ client.on('message', msg => {
       msg.reply(`${max_member} set the max price of ${max_value}.`);
 
     } else {
-
-      msg.reply(`No one has set a max price yet. Please input your turnip price as per the following example: "!price 42"`)
-
+      msg.reply(`No one has set a max price yet.\nPlease input your turnip price as per the following example: "!price 42"`)
     }
-
-    
 
   }
 
-  // TODO: Agregar handling de comando !max y que regrese el precio y el nombre del member (max_member) para saber quien es
+  //TODO: agregar un "!wipe"--resetear el max price cada dia
 
-  //TODO: agregar un "wipe"--resetear el max price cada dia
+  //TODO: Agregar un "!help" que de la lista de comandos y como se usan claramente.
+
+  //TODO: guardar mas los valores de todos en una lista para poder imprimir los valores acumulados de todos.
 
 });
 
