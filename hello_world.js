@@ -72,7 +72,7 @@ client.on('message', msg => {
     //if not, then tell user how to set price
     if (max_message !== undefined) {
 
-      msg.reply(`${max_member} set the max price of ${max_value}.`);
+      msg.reply(`**${max_member}** has the max price of **${max_value}**.`);
 
     } else {
       msg.reply(`No one has set a max price yet.\nPlease input your turnip price as per the following example: "!price 42"`)
@@ -84,7 +84,7 @@ client.on('message', msg => {
     // trip the guard if it isn't tripped.
     if (!reset_guard_tripped) {
       reset_guard_tripped = true;
-      msg.reply(`I'm afraid I can't let you do that...\nPlease type !reset one more time to reset the prices.`);
+      msg.reply(`I'm afraid I can't let you do that...\n**Please type !reset one more time if you're sure to reset the prices**.`);
     } else {
       max_value = 0;
       max_member = "no one";
@@ -92,7 +92,7 @@ client.on('message', msg => {
       reset_guard_tripped = false;
       msg.reply(`Prices cleared.`);
     }
-  
+
     //  - - - - HELP_COMMAND - - - - -
   } else if (msg.content.startsWith(help_command)) {
 
