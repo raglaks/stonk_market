@@ -6,11 +6,14 @@ const client = new Discord.Client();
 //  - - - -INITIAL VALUES - - - - -
 let max_value = 0;
 let max_member = "no one";
-let max_message = "no one";
+let max_message = undefined;
+let reset_guard_tripped = false; // to make sure reset is called twice.
 
 //  - - - -COMMANDS - - - - -
 const price_command = "!price";
 const max_command = "!max";
+const stonk_command = "!stonk";
+const reset_command = "!reset";
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -19,10 +22,10 @@ client.on('ready', () => {
 //  - - - - -DO FOR EVERY MESSAGE - - - - -
 client.on('message', msg => {
 
-  //  - - - - STONK - - - - -
-  if (msg.content === 'stonk') {
+  //  - - - - STONK_COMMAND - - - - -
+  if (msg.content === stonk_command) {
 
-    msg.reply(`stonks for life maddafaka`);
+    msg.reply(`stonks for life maddafaka \n ${msg.createdAt}`);
 
 
   //  - - - - PRICE_COMMAND - - - - -
@@ -66,7 +69,7 @@ client.on('message', msg => {
     //check if max val has been set
     //if so, then return who set it at what price
     //if not, then tell user how to set price
-    if (max_message !== "no one") {
+    if (max_message !== undefined) {
 
       msg.reply(`${max_member} set the max price of ${max_value}.`);
 
@@ -74,9 +77,22 @@ client.on('message', msg => {
       msg.reply(`No one has set a max price yet.\nPlease input your turnip price as per the following example: "!price 42"`)
     }
 
-  }
+  //  - - - - RESET_COMMAND - - - - -
+  } else if (msg.content.startsWith(reset_command)) {
 
-  //TODO: agregar un "!wipe"--resetear el max price cada dia
+    // trip the guard if it isn't tripped.
+    if (!reset_guard_tripped) {
+      reset_guard_tripped = true;
+      msg.reply(`I'm afraid I can't let you do that...\nPlease type !reset one more time to reset the prices.`);
+    } else {
+      max_value = 0;
+      max_member = "no one";
+      max_message = undefined;
+      reset_guard_tripped = false;
+      msg.reply(`Prices cleared.`);
+    }
+
+  }
 
   //TODO: Agregar un "!help" que de la lista de comandos y como se usan claramente.
 
