@@ -84,7 +84,7 @@ client.on('message', msg => {
     // trip the guard if it isn't tripped.
     if (!reset_guard_tripped) {
       reset_guard_tripped = true;
-      msg.reply(`I'm afraid I can't let you do that...\n**Please type !reset one more time if you're sure to reset the prices**.`);
+      msg.reply(`**Please type !reset one more time if you're sure you want to reset the prices**.`);
     } else {
       max_value = 0;
       max_member = "no one";
