@@ -14,6 +14,7 @@ const price_command = "!price";
 const max_command = "!max";
 const stonk_command = "!stonk";
 const reset_command = "!reset";
+const help_command = "!help";
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -91,12 +92,25 @@ client.on('message', msg => {
       reset_guard_tripped = false;
       msg.reply(`Prices cleared.`);
     }
+  
+    //  - - - - HELP_COMMAND - - - - -
+  } else if (msg.content.startsWith(help_command)) {
 
+    let help_message = `
+    Hi @${msg.author.username}! Here are a few commands that you can run:\n
+    **!price**: your turnip price can be set as per the following example: "!price 42"\n
+    **!max**: to check the current max price and the user that set it\n
+    **!reset**: to reset the current max price--PLEASE RUN THIS TWICE IF YOU'RE ABSOLUTELY SURE ABOUT THE RESET\n
+    **!stonk**: only for real stonkers\n
+    `
+    msg.reply(help_message)
   }
 
   //TODO: Agregar un "!help" que de la lista de comandos y como se usan claramente.
 
   //TODO: guardar mas los valores de todos en una lista para poder imprimir los valores acumulados de todos.
+
+  //TODO (long-term but would be v cool): start collecting data individually and collectively for future analysis
 
 });
 
