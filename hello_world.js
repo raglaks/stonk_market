@@ -141,12 +141,7 @@ client.on('message', msg => {
 
   }
 
-  //TODO: Agregar un "!help" que de la lista de comandos y como se usan claramente.
-
-  //TODO: guardar mas los valores de todos en una lista para poder imprimir los valores acumulados de todos.
-
-  //TODO (long-term but would be v cool): start collecting data individually and collectively for future analysis
-
 });
 
+//in my .env file, i added the stonk_test token and called it LOCAL_TOKEN
 client.login(process.env.LOCAL_TOKEN);
