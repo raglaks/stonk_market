@@ -5,6 +5,14 @@ const client = new Discord.Client();
 
 //https://discordapp.com/oauth2/authorize?client_id=696881559399301220&scope=bot
 
+// Checking for prod environment.
+let isProd = false; // let's say it's not.
+
+const myArgs = process.argv.slice(2);
+if(myArgs[0] === 'prod') {
+  isProd = true;
+}
+
 //  - - - -INITIAL VALUES - - - - -
 let max_value = 0;
 let max_member = "no one";
@@ -13,13 +21,23 @@ let reset_guard_tripped = false; // to make sure reset is called twice.
 let set_value = 0;
 
 //  - - - -COMMANDS - - - - -
-const price_command = "!price";
-const max_command = "!max";
-const stonk_command = "!stonk";
-const reset_command = "!reset";
-const help_command = "!help";
-const buy_command = "!buy";
-const set_command = "!set";
+// TODO: If production or testing, change command prefix.
+let command_prefix = undefined;
+
+if (isProd) {
+  command_prefix = '!';
+} else {
+  command_prefix = '-';
+}
+
+// TODO: clean this shit up... it's dirty but it works...
+const price_command = command_prefix + "price";
+const max_command = command_prefix + "max";
+const stonk_command = command_prefix + "stonk";
+const reset_command = command_prefix + "reset";
+const help_command = command_prefix + "help";
+const buy_command = command_prefix + "buy";
+const set_command = command_prefix + "set";
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -143,5 +161,13 @@ client.on('message', msg => {
 
 });
 
-//in my .env file, i added the stonk_test token and called it LOCAL_TOKEN
-client.login(process.env.LOCAL_TOKEN);
+// start the connection with the correct token depending on the environment.
+let token = '';
+
+if (isProd) {
+  token = process.env.TOKEN;
+} else {
+  token = process.env.LOCAL_TOKEN;
+}
+
+client.login(token);
