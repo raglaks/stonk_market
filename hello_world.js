@@ -20,6 +20,10 @@ let max_message = undefined;
 let reset_guard_tripped = false; // to make sure reset is called twice.
 let set_value = 0;
 
+// - - - - - DATA STRUCTURES - - - - - - 
+// note: this is not the way we want to go for structure, leaving as a placeholder.
+let playerMembersMap = new Map(); // structure: { 'playerName' => { am : number, pm : number} }
+
 //  - - - -COMMANDS - - - - -
 // TODO: If production or testing, change command prefix.
 let command_prefix = undefined;
@@ -38,9 +42,15 @@ const reset_command = command_prefix + "reset";
 const help_command = command_prefix + "help";
 const buy_command = command_prefix + "buy";
 const set_command = command_prefix + "set";
+const wipe_command = command_prefix + "wipe";
+const list_command = command_prefix + "list";
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+
+  // do some init things.
+  initplayerMembersMap();
+
 });
 
 //  - - - - -DO FOR EVERY MESSAGE - - - - -
@@ -50,7 +60,6 @@ client.on('message', msg => {
   if (msg.content === stonk_command) {
 
     msg.reply(`stonks for life maddafaka \n ${msg.createdAt}`);
-
 
   //  - - - - PRICE_COMMAND - - - - -
   } else if (msg.content.startsWith(price_command)) {
@@ -157,9 +166,36 @@ client.on('message', msg => {
       msg.reply(`The turnip buy price has been set at ${set_value}!`)
     }
 
+  //- - - - - -  WIPE_COMMAND - - - - -
+  } else if (msg.content.startsWith(wipe_command)) {
+    initplayerMembersMap();
+    msg.reply(`Player data wiped!`);
+
+  // - - - - - - LIST_COMMAND - - - - 
+  } else if (msg.content.startsWith(list_command)) {
+
+    let list = '\n';
+
+    for (const e of playerMembersMap) {
+      //console.log(e);
+      list += `**${e[0]}** -- *AM*: ${e[1].am} *PM:* ${e[1].pm}\n`;
+    }
+    
+    msg.reply(list); 
   }
+  
 
 });
+
+function initplayerMembersMap() {
+  client.guilds.resolve(process.env.GUILD_ID).members.cache.forEach( (m) => {
+    m.roles.cache.forEach((r) => {
+      if (r.name === 'player') {
+        playerMembersMap.set(m.user.username, {am : 0, pm : 0});
+      }
+    });
+  });
+}
 
 // start the connection with the correct token depending on the environment.
 let token = '';
