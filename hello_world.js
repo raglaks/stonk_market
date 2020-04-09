@@ -195,8 +195,21 @@ client.on('message', msg => {
 
   //- - - - - -  WIPE_COMMAND - - - - -
   } else if (msg.content.startsWith(wipe_command)) {
-    initPlayerMembersMap();
-    msg.reply(`Player data wiped!`);
+
+    let messagerIsManager = false;
+
+    msg.member.roles.cache.forEach((r) => {
+      if (r.name === 'manager') {
+        messagerIsManager = true;
+      }
+    });
+
+    if (messagerIsManager) {
+      initPlayerMembersMap();
+      msg.reply(`Player data wiped!`);
+    } else {
+      msg.reply(`I'm sorry, you don't have the necessary permissions to wipe the data. Please contact a manager.`);
+    }
 
   // - - - - - - LIST_COMMAND - - - - 
   } else if (msg.content.startsWith(list_command)) {
