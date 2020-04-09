@@ -22,7 +22,14 @@ let set_value = 0;
 
 // - - - - - DATA STRUCTURES - - - - - - 
 // note: this is not the way we want to go for structure, leaving as a placeholder.
-let playerMembersMap = new Map(); // structure: { 'playerName' => { am : number, pm : number} }
+let playerMembersMap = new Map(); // structure: { 'playerName' => DayData{ am : number, pm : number} }
+
+class DayData {
+  constructor() {
+    this.am = 0;
+    this.pm = 0;
+  }
+}
 
 //  - - - -COMMANDS - - - - -
 // TODO: If production or testing, change command prefix.
@@ -36,6 +43,8 @@ if (isProd) {
 
 // TODO: clean this shit up... it's dirty but it works...
 const price_command = command_prefix + "price";
+const amprice_command = command_prefix + "amprice";
+const pmprice_command = command_prefix + "pmprice";
 const max_command = command_prefix + "max";
 const stonk_command = command_prefix + "stonk";
 const reset_command = command_prefix + "reset";
@@ -49,7 +58,7 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 
   // do some init things.
-  initplayerMembersMap();
+  initPlayerMembersMap();
 
 });
 
@@ -64,8 +73,15 @@ client.on('message', msg => {
   //  - - - - PRICE_COMMAND - - - - -
   } else if (msg.content.startsWith(price_command)) {
 
+    const mensaje = `**Warning!** We have stopped using the !price command.\n Please use the **!amprice** and **!pmprice** commands now. Use **!help** for more information.`;
+
+    msg.reply(mensaje);
+
+  //  - - - - AMPRICE_COMMAND - - - - -
+  } else if (msg.content.startsWith(amprice_command)) {
+
     // get the price
-    const intToParse = msg.content.substring(price_command.length, msg.content.len);
+    const intToParse = msg.content.substring(amprice_command.length, msg.content.len);
 
     // parse it to an int
     const parsedInt = parseInt(intToParse);
@@ -73,27 +89,36 @@ client.on('message', msg => {
     // check that we did get a number
     if (isNaN(parsedInt)) {
 
-      msg.reply(`Please input your turnip price as per the following example: "!price 42"`);
+      msg.reply(`Please input your turnip am price as per the following example: "!amprice 42"`);
 
     } else {
-      // checks if current price entered is greater than max price
-      if (parsedInt > max_value) {
 
-        //if so, then set new max price to current price and also set new max member to current member
-        max_value = parsedInt;
-        max_member = msg.author.username;
+      // Add the number to the user's AM value.
+      playerMembersMap.get(msg.author.username).am = parsedInt;
+      
+      msg.reply(`Noting your **AM** turnip price to be ${parsedInt}`);
+    }
 
-        //string message for who's setting new max price
-        max_message = `${max_member} set the new max price of ${max_value}`;
+  //  - - - - PMPRICE_COMMAND - - - - -
+  } else if (msg.content.startsWith(pmprice_command)) {
 
-        //discord js reply method w complete message that new max price has been set by ...
-        msg.reply(`Noting your turnip price to be ${parsedInt}\n${max_message}`);
+    // get the price
+    const intToParse = msg.content.substring(amprice_command.length, msg.content.len);
 
-      } else {
-        //simply for UI purposes--acknowledging user input
-        // Nice to have: change this to an emoji reaction on the message.
-        msg.reply(`Noting your turnip price to be ${parsedInt}`);
-      }
+    // parse it to an int
+    const parsedInt = parseInt(intToParse);
+
+    // check that we did get a number
+    if (isNaN(parsedInt)) {
+
+      msg.reply(`Please input your turnip pm price as per the following example: "!pmprice 42"`);
+
+    } else {
+
+      // Add the number to the user's AM value.
+      playerMembersMap.get(msg.author.username).pm = parsedInt;
+      
+      msg.reply(`Noting your **PM** turnip price to be ${parsedInt}`);
     }
 
   //  - - - - MAX_COMMAND - - - - -
@@ -130,9 +155,11 @@ client.on('message', msg => {
 
     let help_message = `
     Hi @${msg.author.username}! Here are a few commands that you can run:\n
-    **!price**: your turnip price can be set as per the following example: "!price 42"\n
-    **!max**: to check the current max price and the user that set it\n
-    **!reset**: to reset the current max price--PLEASE RUN THIS TWICE IF YOU'RE ABSOLUTELY SURE ABOUT THE RESET\n
+    **!amprice**: Set your AM turnip price as per the following example: "!amprice 42"\n
+    **!pmprice**: Set your PM turnip price as per the following example: "!pmprice 96"\n
+    **!wipe**: To wipe (reset to zero) the list of users' AM and PM prices.\n
+    [NOT WORKING WITH AM AND PM PRICE YET] **!max**: to check the current max price and the user that set it\n
+    [NOT WORKING WITH AM AND PM PRICE YET] **!reset**: to reset the current max price--PLEASE RUN THIS TWICE IF YOU'RE ABSOLUTELY SURE ABOUT THE RESET\n
     **!set**: to set the buy price for the week as per the following example: "!set 42"\n
     **!buy**: to check the buy price of the current week\n
     **!stonk**: only for real stonkers\n
@@ -168,7 +195,7 @@ client.on('message', msg => {
 
   //- - - - - -  WIPE_COMMAND - - - - -
   } else if (msg.content.startsWith(wipe_command)) {
-    initplayerMembersMap();
+    initPlayerMembersMap();
     msg.reply(`Player data wiped!`);
 
   // - - - - - - LIST_COMMAND - - - - 
@@ -178,20 +205,18 @@ client.on('message', msg => {
 
     for (const e of playerMembersMap) {
       //console.log(e);
-      list += `**${e[0]}** -- *AM*: ${e[1].am} *PM:* ${e[1].pm}\n`;
+      list += `**${e[0]}** -- *AM*: **${e[1].am}** *PM:* **${e[1].pm}**\n`;
     }
     
-    msg.reply(list); 
+    msg.reply(list);
   }
-  
-
 });
 
-function initplayerMembersMap() {
+function initPlayerMembersMap() {
   client.guilds.resolve(process.env.GUILD_ID).members.cache.forEach( (m) => {
     m.roles.cache.forEach((r) => {
       if (r.name === 'player') {
-        playerMembersMap.set(m.user.username, {am : 0, pm : 0});
+        playerMembersMap.set(m.user.username, new DayData());
       }
     });
   });
