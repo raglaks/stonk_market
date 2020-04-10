@@ -17,7 +17,6 @@ if(myArgs[0] === 'prod') {
 let max_value = 0;
 let max_member = "no one";
 let max_message = undefined;
-let reset_guard_tripped = false; // to make sure reset is called twice.
 let set_value = 0;
 
 // - - - - - DATA STRUCTURES - - - - - - 
@@ -47,7 +46,6 @@ const amprice_command = command_prefix + "amprice";
 const pmprice_command = command_prefix + "pmprice";
 const max_command = command_prefix + "max";
 const stonk_command = command_prefix + "stonk";
-const reset_command = command_prefix + "reset";
 const help_command = command_prefix + "help";
 const buy_command = command_prefix + "buy";
 const set_command = command_prefix + "set";
@@ -93,10 +91,28 @@ client.on('message', msg => {
 
     } else {
 
+      // checks if current price entered is greater than max price
+      if (parsedInt > max_value) {
+
+        //if so, then set new max price to current price and also set new max member to current member
+        max_value = parsedInt;
+        max_member = msg.author.username;
+
+        //string message for who's setting new max price
+        max_message = `${max_member} set the new max **AM** price of ${max_value}`;
+
+        //discord js reply method w complete message that new max price has been set by ...
+        msg.reply(`Noting your **AM** turnip price to be ${parsedInt}\n${max_message}`);
+
+      } else {
+        //simply for UI purposes--acknowledging user input
+        // Nice to have: change this to an emoji reaction on the message.
+        msg.reply(`Noting your **AM** turnip price to be ${parsedInt}`);
+      }
+
       // Add the number to the user's AM value.
       playerMembersMap.get(msg.author.username).am = parsedInt;
       
-      msg.reply(`Noting your **AM** turnip price to be ${parsedInt}`);
     }
 
   //  - - - - PMPRICE_COMMAND - - - - -
@@ -115,10 +131,27 @@ client.on('message', msg => {
 
     } else {
 
-      // Add the number to the user's AM value.
+      if (parsedInt > max_value) {
+
+        //if so, then set new max price to current price and also set new max member to current member
+        max_value = parsedInt;
+        max_member = msg.author.username;
+
+        //string message for who's setting new max price
+        max_message = `${max_member} set the new max **PM** price of ${max_value}`;
+
+        //discord js reply method w complete message that new max price has been set by ...
+        msg.reply(`Noting your **PM** turnip price to be ${parsedInt}\n${max_message}`);
+
+      } else {
+        //simply for UI purposes--acknowledging user input
+        // Nice to have: change this to an emoji reaction on the message.
+        msg.reply(`Noting your **PM** turnip price to be ${parsedInt}`);
+      }
+
+      // Add the number to the user's PM value.
       playerMembersMap.get(msg.author.username).pm = parsedInt;
       
-      msg.reply(`Noting your **PM** turnip price to be ${parsedInt}`);
     }
 
   //  - - - - MAX_COMMAND - - - - -
@@ -132,22 +165,7 @@ client.on('message', msg => {
       msg.reply(`**${max_member}** has the max price of **${max_value}**.`);
 
     } else {
-      msg.reply(`No one has set a max price yet.\nPlease input your turnip price as per the following example: "!price 42"`)
-    }
-
-  //  - - - - RESET_COMMAND - - - - -
-  } else if (msg.content.startsWith(reset_command)) {
-
-    // trip the guard if it isn't tripped.
-    if (!reset_guard_tripped) {
-      reset_guard_tripped = true;
-      msg.reply(`**Please type !reset one more time if you're sure you want to reset the prices**.`);
-    } else {
-      max_value = 0;
-      max_member = "no one";
-      max_message = undefined;
-      reset_guard_tripped = false;
-      msg.reply(`Prices cleared.`);
+      msg.reply(`No one has set a max price yet.\nPlease input your turnip price as per the following example: "!pmprice 42"`)
     }
 
     //  - - - - HELP_COMMAND - - - - -
@@ -158,8 +176,7 @@ client.on('message', msg => {
     **!amprice**: Set your AM turnip price as per the following example: "!amprice 42"\n
     **!pmprice**: Set your PM turnip price as per the following example: "!pmprice 96"\n
     **!wipe**: To wipe (reset to zero) the list of users' AM and PM prices.\n
-    [NOT WORKING WITH AM AND PM PRICE YET] **!max**: to check the current max price and the user that set it\n
-    [NOT WORKING WITH AM AND PM PRICE YET] **!reset**: to reset the current max price--PLEASE RUN THIS TWICE IF YOU'RE ABSOLUTELY SURE ABOUT THE RESET\n
+    **!max**: to check the current max price and the user that set it\n
     **!set**: to set the buy price for the week as per the following example: "!set 42"\n
     **!buy**: to check the buy price of the current week\n
     **!stonk**: only for real stonkers\n
@@ -206,6 +223,9 @@ client.on('message', msg => {
 
     if (messagerIsManager) {
       initPlayerMembersMap();
+      max_value = 0;
+      max_member = "no one";
+      max_message = undefined;
       msg.reply(`Player data wiped!`);
     } else {
       msg.reply(`I'm sorry, you don't have the necessary permissions to wipe the data. Please contact a manager.`);
@@ -217,7 +237,7 @@ client.on('message', msg => {
     let list = '\n';
 
     for (const e of playerMembersMap) {
-      //console.log(e);
+      console.log(e);
       list += `**${e[0]}** -- *AM*: **${e[1].am}** *PM:* **${e[1].pm}**\n`;
     }
     

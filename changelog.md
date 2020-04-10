@@ -16,3 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Deprecated price command. Related commands do not work anymore.
 - Changed help command printout to reflect commands that do not work with new amprice and pmprice commands.
+- Updated help command to reflect current active/working commands (2020-04-09)
+- Fixed max command (added it to both price commands and included its global variables in the wipe command) (2020-04-09)
+
+### Deprecated
+- Deprecated reset command--wipe command replaced it (2020-04-09)
